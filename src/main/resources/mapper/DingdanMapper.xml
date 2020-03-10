@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miaosha.demo.dao.DingdanDao">
+
+    <!--
+        <resultMap type="com.miaosha.demo.entity.Dingdan" id="DingdanMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="uid" column="uid" jdbcType="INTEGER"/>
+        <result property="sid" column="sid" jdbcType="INTEGER"/>
+    </resultMap>
+    -->
+
+    <!--查询单个-->
+    <select id="queryDingdanById" resultType="com.alibaba.fastjson.JSONObject">
+        select
+          id, uid, sid
+        from miaosha.dingdan
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllDingdanByLimit" resultType="com.alibaba.fastjson.JSONObject">
+        select
+          id, uid, sid
+        from miaosha.dingdan
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAllDingdan" resultType="com.alibaba.fastjson.JSONObject">
+        select
+          id, uid, sid
+        from miaosha.dingdan
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="uid != null">
+                and uid = #{uid}
+            </if>
+            <if test="sid != null">
+                and sid = #{sid}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insertDingdan" keyProperty="id" useGeneratedKeys="true">
+        insert into miaosha.dingdan(uid, sid)
+        values (#{uid}, #{sid})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="updateDingdan" parameterType="com.alibaba.fastjson.JSONObject">
+        update miaosha.dingdan
+        <set>
+            <if test="uid != null">
+                uid = #{uid},
+            </if>
+            <if test="sid != null">
+                sid = #{sid},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteDingdanById">
+        delete from miaosha.dingdan where id = #{id}
+    </delete>
+
+    <!--自定义-->
+    <select id="countDingdan" resultType="Integer">
+        SELECT count(0)
+        FROM dingdan w
+        WHERE w.flag = 1 and w.uid = #{uid}
+    </select>
+    
+    <select id="listDingdan" resultType="com.alibaba.fastjson.JSONObject">
+        SELECT
+            w.id                                      id,
+            w.dingdan_name                 dingdanName,
+            date_format(w.create_time, '%Y.%m.%d %T') createTime
+        FROM dingdan w
+        WHERE w.flag = 1 and w.uid = #{uid}
+        ORDER BY w.id DESC
+        LIMIT #{offSet}, #{pageRow}
+    </select>
+    
+    <update id="deleteDingdan" parameterType="com.alibaba.fastjson.JSONObject">
+        UPDATE dingdan
+        SET
+            flag = 0
+        WHERE id = #{id}
+    </update>
+</mapper>

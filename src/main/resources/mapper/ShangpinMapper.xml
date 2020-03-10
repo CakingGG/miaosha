@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miaosha.demo.dao.ShangpinDao">
+
+    <!--
+        <resultMap type="com.miaosha.demo.entity.Shangpin" id="ShangpinMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="INTEGER"/>
+        <result property="flag" column="flag" jdbcType="INTEGER"/>
+    </resultMap>
+    -->
+
+    <!--查询单个-->
+    <select id="queryShangpinById" resultType="com.alibaba.fastjson.JSONObject">
+        select
+          id, name, num, flag
+        from miaosha.shangpin
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllShangpinByLimit" resultType="com.alibaba.fastjson.JSONObject">
+        select
+          id, name, num, flag
+        from miaosha.shangpin
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAllShangpin" resultType="com.alibaba.fastjson.JSONObject">
+        select
+          id, name, num, flag
+        from miaosha.shangpin
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="num != null">
+                and num = #{num}
+            </if>
+            <if test="flag != null">
+                and flag = #{flag}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insertShangpin" keyProperty="id" useGeneratedKeys="true">
+        insert into miaosha.shangpin(name, num, flag)
+        values (#{name}, #{num}, #{flag})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="updateShangpin" parameterType="com.alibaba.fastjson.JSONObject">
+        update miaosha.shangpin
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="num != null">
+                num = #{num},
+            </if>
+            <if test="flag != null">
+                flag = #{flag},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteShangpinById">
+        delete from miaosha.shangpin where id = #{id}
+    </delete>
+
+    <!--自定义-->
+    <select id="countShangpin" resultType="Integer">
+        SELECT count(0)
+        FROM shangpin w
+        WHERE w.flag = 1 and w.uid = #{uid}
+    </select>
+    
+    <select id="listShangpin" resultType="com.alibaba.fastjson.JSONObject">
+        SELECT
+            w.id                                      id,
+            w.shangpin_name                 shangpinName,
+            date_format(w.create_time, '%Y.%m.%d %T') createTime
+        FROM shangpin w
+        WHERE w.flag = 1 and w.uid = #{uid}
+        ORDER BY w.id DESC
+        LIMIT #{offSet}, #{pageRow}
+    </select>
+    
+    <update id="deleteShangpin" parameterType="com.alibaba.fastjson.JSONObject">
+        UPDATE shangpin
+        SET
+            flag = 0
+        WHERE id = #{id}
+    </update>
+
+    <update id="countDownNum" parameterType="com.alibaba.fastjson.JSONObject">
+        UPDATE shangpin
+        SET
+            num = num - 1,
+            vision = vision + 1
+        WHERE id = #{id} AND vision = #{vision} AND num > 0
+    </update>
+
+    <select id="queryNumAndVision" resultType="com.alibaba.fastjson.JSONObject">
+        SELECT id, num, vision
+        FROM shangpin
+        WHERE id = #{id} FOR UPDATE
+    </select>
+</mapper>
