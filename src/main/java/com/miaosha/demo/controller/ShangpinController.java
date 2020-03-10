@@ -49,6 +49,7 @@ public class ShangpinController {
 
     @PostMapping("countDownNum")
     public JSONObject countDownNum(@RequestBody JSONObject requestJson){
+        //倒计时
         Object countDownTime = redisUtil.get("countDownTime");
         if(countDownTime == null){
             CommonUtil.hasAllRequired(requestJson, "id");
